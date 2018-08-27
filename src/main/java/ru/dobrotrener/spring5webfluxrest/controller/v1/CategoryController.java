@@ -17,7 +17,7 @@ import ru.dobrotrener.spring5webfluxrest.repository.CategoryRepository;
 public class CategoryController {
 
 
-    public static final String BASE_URL = "/api/v1/categories";
+    public static final String BASE_URL = "/api/v1/categories/";
     private final CategoryRepository categoryRepository;
 
     public CategoryController(CategoryRepository categoryRepository) {
