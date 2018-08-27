@@ -4,7 +4,9 @@ package ru.dobrotrener.spring5webfluxrest.controller.v1;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,7 +44,7 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Mono<Void> create(@RequestBody  Publisher<Category> categoryStream) {
+    Mono<Void> create(@RequestBody Publisher<Category> categoryStream) {
         return categoryRepository.saveAll(categoryStream)
                 .then();
     }
@@ -52,5 +54,22 @@ public class CategoryController {
         category.setId(id);
         return categoryRepository.save(category);
     }
+
+    @PatchMapping("{id}")
+    Mono<Category> patch(@PathVariable String id, @RequestBody Category category) {
+        Category foundCategory = categoryRepository.findById(id).block();
+
+        if (foundCategory == null) {
+            throw new RuntimeException("Category not found for id: " + id);
+        }
+
+        if (category.getDescription() != null &&
+                !category.getDescription().equals(foundCategory.getDescription())) {
+            foundCategory.setDescription(category.getDescription());
+            return categoryRepository.save(foundCategory);
+        }
+        return Mono.just(foundCategory);
+    }
+
 
 }
